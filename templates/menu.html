@@ -2,7 +2,7 @@
 <body>
 <div id="overlaylong" class="overlaylong">
   <div id="busyspinner" class="wraptocenter">
-    <img src="static/images/busy.png"></img>
+    <img src="static/images/busy.gif"></img>
   </div>
 </div>
 <div id="overlayshort" class="overlayshort">
@@ -96,17 +96,19 @@ if(getCookie('show_tutorials')=='true'){
             text: "Ok",
             click: function() {
                $(this).dialog("close");
+               $("#contents").show();
             }
          }
       }
    });
 } else {
    $("#dialog-message").hide();
+   $("#contents").show();
 }
 });
 </script>
 <!--Embed Contents-->
-{{contents_html}}
+<span id="contents" style="display:none">{{contents_html}}</span>
 </body>
 </html> 
 

@@ -1,5 +1,4 @@
 <!-- GUI -->
-<div id="contents" style="display:none">
 <br>
 <div class="responsive-wrapper">
 
@@ -41,7 +40,6 @@
 <button id="download" class="ui-widget-content ui-corner-all">Download</button>
 </span>
 </center>
-</div>
 
 <script>
 $(document).ready(function() {
@@ -202,7 +200,6 @@ $(document).ready(function() {
                   setup_videoplayer();
                   $('#dbsave').show();
                }
-               $('#contents').show(); //Delay reveal as buttons take a while to setup and this gets seen
             },
             failure: function(data) {
                alert("Failed to check video file exists");
@@ -258,5 +255,7 @@ $(document).ready(function() {
       success: got_projectitems,
       failure: function(data) { alert("Failed to get project items"); }
    }); //End get projectitems
+
+   $("#contents").show() //Video wont setup properly if hidden
 });
 </script>
