@@ -1,0 +1,262 @@
+<!-- GUI -->
+<div id="contents" style="display:none">
+<br>
+<div class="responsive-wrapper">
+
+<div id="jp_container_video_1" class="jp-flat-video" role="application" aria-label="media player">
+        <div id="jquery_jplayer_video_1" class="jp-jplayer"></div>
+        <div class="jp-gui">
+                <div class="jp-play-control jp-control">
+                        <button class="jp-play jp-button" role="button" aria-label="play" tabindex="0"></button>
+                </div>
+                <div class="jp-bar">
+                        <div class="jp-seek-bar jp-seek-bar-display"></div>
+                        <div class="jp-seek-bar">
+                                <div class="jp-play-bar"></div>
+                                <div class="jp-details"><span class="jp-title" aria-label="title"></span></div>
+                                <div class="jp-timing"><span class="jp-duration" role="timer" aria-label="duration"></span></div>
+                        </div>
+                </div>
+                <div class="jp-screen-control jp-control">
+                        <button class="jp-full-screen jp-button" role="button" aria-label="full screen" tabindex="0"></button>
+                </div>
+        </div>
+        <div class="jp-no-solution">
+                Media Player Error<br />
+                Update your browser or Flash plugin
+        </div>
+</div>
+
+</div>
+
+<center>
+<br><br>
+<button id="create-video">Render...</button>
+<span id="dbsave">
+&nbsp
+<button id="dbbutton" class="ui-widget-content ui-corner-all">
+   <img class="dbbuttonimg" src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbspSave...
+</button>
+&nbsp
+<button id="download" class="ui-widget-content ui-corner-all">Download</button>
+</span>
+</center>
+</div>
+
+<script>
+$(document).ready(function() {
+   //Hide buttons incase video not available
+   $('#dbsave').hide();
+
+   //Setup create button
+   setup_create_button = function() {
+      $("#create-video").button().on("click", function() {
+      $("#overlayshort").show();
+         $.ajax({
+            url: 'createvideo?ver='+$.now(),
+            type: 'GET',
+            complete: function() { location.reload(); },
+            failure: function(data) { alert('Failed to render video'); }
+         });
+      });
+   }
+   //Setup download button
+   setup_download_button = function() {
+      $('#download').button().click(function(event) {
+         var pom = document.createElement('a');
+         pom.setAttribute('href', videourl);
+         pom.setAttribute('download', "DICHE.mp4");
+         if (document.createEvent) {
+            var event = document.createEvent('MouseEvents');
+           event.initEvent('click', true, true);
+           pom.dispatchEvent(event);
+         } else {
+            pom.click();
+         }
+      });
+   }
+
+   //Setup Dropbox saver buttom
+   setup_dropbox_saver_button = function() {
+      $("#dbbutton").button().on("click", function() {
+         var options = {
+            success: function() {},
+            progress: function(progress) {},
+            cancel: function() {},
+            error: function(errorMessage) {
+               alert("Failed to save image:" + errorMessage);
+            }
+         };
+         Dropbox.save(videourl, "DICHE.mp4", options);
+      });
+   }
+
+   //Setup Video Player
+   setup_videoplayer = function() {
+               $("#jquery_jplayer_video_1").jPlayer({
+                  ready: function(event) {
+                     var $this = $(this).jPlayer("setMedia", {
+                        title: "",
+                        m4v: videourl,
+                        poster: "http://diche-app.eu.org/static/images/DICHE-logo.svg"
+                     });
+                     // Fix GUI when Full Screen button is hidden.
+                     if (event.jPlayer.status.noFullWindow) {
+                        var $anc = $($this.jPlayer("option", "cssSelectorAncestor"));
+                        $anc.find('.jp-screen-control').hide();
+                        $anc.find('.jp-bar').css({
+                           "right": "0"
+                        });
+                     }
+                     // Fix the responsive size for iOS and Flash.
+                     var fix_iOS_flash = function() {
+                        var w = $this.data("jPlayer").ancestorJq.width(),
+                           h = w * 9 / 16; // Change to suit your aspect ratio. Used 16:9 HDTV ratio.
+                        $this.jPlayer("option", "size", {
+                           width: w + "px",
+                           height: h + "px"
+                        });
+                     };
+                     var plt = $.jPlayer.platform;
+                     if (plt.ipad || plt.iphone || plt.ipod || event.jPlayer.flash.used) {
+                        $(window).on("resize", function() {
+                           fix_iOS_flash();
+                        });
+                        fix_iOS_flash();
+                     }
+                  },
+                  timeFormat: {
+                     padMin: false
+                  },
+                  swfPath: "js",
+                  supplied: "m4v",
+                  cssSelectorAncestor: "#jp_container_video_1",
+                  // See the CSS for more info on changing the size.
+                  size: {
+                     width: "100%",
+                     height: "auto",
+                     cssClass: "jp-flat-video-responsive"
+                  },
+                  sizeFull: {
+                     cssClass: "jp-flat-video-full"
+                  },
+                  autohide: {
+                     full: false,
+                     restored: false
+                  },
+                  // While playing, allow the GUI to hide
+                  play: function() {
+                     $(this).jPlayer("option", "autohide", {
+                        full: true,
+                        restored: true
+                     });
+                     // Avoid multiple jPlayers playing together.
+                     $(this).jPlayer("pauseOthers");
+                  },
+                  // When paused, show the GUI
+                  pause: function() {
+                     $(this).jPlayer("option", "autohide", {
+                        full: false,
+                        restored: false
+                     });
+                  },
+                  // Enable clicks on the video to toggle play/pause
+                  click: function(event) {
+                     if (event.jPlayer.status.paused) {
+                        $(this).jPlayer("play");
+                     } else {
+                        $(this).jPlayer("pause");
+                     }
+                  },
+                  useStateClassSkin: true,
+                  autoBlur: false,
+                  smoothPlayBar: !($.jPlayer.browser.msie && $.jPlayer.browser.version < 9),
+                  remainingDuration: true,
+                  keyEnabled: true,
+                  keyBindings: {
+                     // Disable some of the default key controls
+                     loop: null,
+                     muted: null,
+                     volumeUp: null,
+                     volumeDown: null
+                  }
+               }); //End init jPlayer
+   }
+
+   //Check video exists (or don't setup video player and download buttons and hide them)
+   setup_video = function() {
+         videofile = getCookie("selected_project")+"/DICHE.mp4?var="+(new Date()).getTime()
+         $.ajax({
+            url: "/userfiles-check/" + videofile,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+               videourl = "http://diche-app.eu.org/static/images/DICHE-logo.mp4"; //Placeholder
+               if (data['exists']) {
+                  videourl = "http://diche-app.eu.org/userfiles/" + project_object['account_id'] + "/" + videofile;
+                  //Download button
+                  setup_download_button();
+                  //Dropbox saver button
+                  setup_dropbox_saver_button();
+                  //Video Player
+                  setup_videoplayer();
+                  $('#dbsave').show();
+               }
+               $('#contents').show(); //Delay reveal as buttons take a while to setup and this gets seen
+            },
+            failure: function(data) {
+               alert("Failed to check video file exists");
+            }
+         }); //End check video exists
+   }
+   //Successfully got project items object, now use it to setup the page
+   got_projectitems = function(data) {
+         project_object = data;
+         
+         //Create button (always available)
+         setup_create_button();
+
+         //Check if currently rendering (if so just show spinner and cancel button)
+         meltpidfile = getCookie("selected_project")+"/.meltpid?var="+(new Date()).getTime()
+         $.ajax({
+            url: "/userfiles-check/"+meltpidfile+"?ver="+$.now(),
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+               if (data['exists']) {
+                  //Cancel button
+                  setup_cancel_button();
+                  $("#overlaylong").show();
+                  setTimeout(function(){ location.reload(); }, 15000);
+               } else { //Not currently rendering (potentially show video and download buttons)
+                  setup_video();
+               }
+            },
+            failure: function(data) { alert("Failed to check .meltpid file exists"); }
+         }); //End check .meltpid exists
+   } //End of got_projectitems callback
+
+   //Allow render interrupt with cancel button
+   setup_cancel_button = function() {
+   $('#busyspinner').append('<div><button id="cancel">Interrupt</button></div>');
+   $('#cancel').button().on("click", function() {
+      $(this).prop("disabled",true).button('refresh', true)
+      $.ajax({
+         url: 'createvideo',
+         type: 'DELETE',
+         success: function() { location.reload(); },
+         failure: function(data) { alert('Failed to cancel rendering'); }
+      });
+   });
+   }
+
+   //Get projectitems and setup player if video available
+   $.ajax({
+      url: 'projectitems?ver='+$.now(),
+      type: 'GET',
+      dataType: 'json',
+      success: got_projectitems,
+      failure: function(data) { alert("Failed to get project items"); }
+   }); //End get projectitems
+});
+</script>
