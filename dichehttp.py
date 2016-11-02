@@ -2,6 +2,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 import tornado.template
+import tornado.options
 import requests
 import json
 import os
@@ -11,6 +12,7 @@ import ffmpy
 import time
 import random
 import subprocess
+import logging
 from secrets import APP_KEY,APP_SECRET,COOKIE_SECRET
 
 class LandingHandler(tornado.web.RequestHandler):
@@ -72,6 +74,11 @@ class MenuHandler(tornado.web.RequestHandler):
         self.enabled_menu_ids = {'menuitem_settings','menuitem_logout'}
         if _project_is_selected: self.enabled_menu_ids.update(['menuitem_sounds'])
         if self.audio_is_available: self.enabled_menu_ids.update(['menuitem_words','menuitem_pictures','menuitem_render'])
+        #Logging (only start logging when project selected)
+        try:
+           logging.log(100,'"'+self.account_id+'","'+self.selected_project+'","'+self.request.uri+'"')
+        except:
+           pass
 
     def dbpost(self,url,data):
         headers = {
@@ -163,6 +170,7 @@ class DataHandler(tornado.web.RequestHandler):
         if not self.selected_project: return #Allow partial setup
         self.project_path = self.user_path+self.selected_project+"/"
         self.project_filename = self.project_path+"DICHE.json"
+        #logging.log(100,'"'+self.account_id+'","'+self.selected_project+'","'+self.request.method+'","'+self.request.uri+'"')
 
 class InitProjectHandler(DataHandler):
     def get(self):
@@ -433,6 +441,11 @@ def make_app():
     ],debug=False, cookie_secret=COOKIE_SECRET)
 
 if __name__ == "__main__":
+    logging.basicConfig(level=0, #100
+                        filename="static/log.html",
+                        format='%(asctime)s%(message)s',
+                        datefmt='%m/%d/%Y,%H:%M:%S,')
+    #tornado.options.parse_command_line()
     app=make_app()
     #app.listen(8080)
     https_server=tornado.httpserver.HTTPServer(app)
