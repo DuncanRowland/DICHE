@@ -23,3 +23,5 @@
   * Development Notes:
     * icon helper: http://www.favicomatic.com/
     * openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+   
+This project has received funding from the European Commission Erasmus+ Programme under grant agreement no 2015-1-NL01-KA201-009021.
