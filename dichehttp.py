@@ -183,6 +183,9 @@ class ProjectItemsHandler(DataHandler):
 
 class ProjectItemHandler(DataHandler):
     def get(self):
+        if not hasattr(self, 'project_filename'):
+            self.write(json.dumps({'showtuts':'true'}))
+            return
         with open(self.project_filename, 'r+') as f:
             text = f.read()
             o=json.loads(text)

@@ -41,6 +41,7 @@ if __name__ == "__main__":
     https_server=tornado.httpserver.HTTPServer(app, ssl_options={
         "certfile": "keys/cert.pem",
         "keyfile": "keys/key.pem",
+        "ca_certs": "keys/COMODORSADomainValidationSecureServerCA.crt",
     })
     https_server.listen(8888)
     tornado.ioloop.IOLoop.current().start()
