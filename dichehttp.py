@@ -249,10 +249,10 @@ class SetAudioHandler(DataHandler):
         ff = ffmpy.FFmpeg(
             inputs={audiofilename: None},
             outputs={
-               self.project_path+"DICHE.mp3": '-y -acodec libmp3lame -ab 128k'
+               self.project_path+"DICHE.mp3": '-loglevel fatal -y -acodec libmp3lame -ab 128k'
             } 
         )
-        print(ff.run())
+        ff.run() #print(ff.run())
         os.remove(audiofilename)
 
 class ImageSetHandler(DataHandler):
@@ -377,7 +377,6 @@ class CreateVideoHandler(DataHandler):
         subprocess.Popen(params)
 
     def delete(self):
-        print("DELETE")
         pidfile = self.project_path+".meltpid"
         if not os.path.exists(pidfile):
            return
