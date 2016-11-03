@@ -246,13 +246,17 @@ class SetAudioHandler(DataHandler):
         with open(audiofilename, 'bw') as f:
             r = requests.get(audiofileurl)
             f.write(r.content)
-        ff = ffmpy.FFmpeg(
-            inputs={audiofilename: None},
-            outputs={
-               self.project_path+"DICHE.mp3": '-loglevel fatal -y -acodec libmp3lame -ab 128k'
-            } 
-        )
-        ff.run() #print(ff.run())
+        if audiofilename[-3:].lower()=='amr': #bug in ffmpeg for amr?
+            params = ["sox",audiofilename,self.project_path+"DICHE.mp3"]
+            subprocess.check_call(params)
+        else:
+            ff = ffmpy.FFmpeg(
+                inputs={audiofilename: None},
+                outputs={
+                   self.project_path+"DICHE.mp3": '-loglevel fatal -y -acodec libmp3lame -ab 128k'
+                } 
+            )
+            ff.run() #print(ff.run())
         os.remove(audiofilename)
 
 class ImageSetHandler(DataHandler):
@@ -299,7 +303,8 @@ class ImageSetHandler(DataHandler):
             #Delete existing image
             imagename = o["imagelist"][imageindex]['imagename']
             imagefilename = self.project_path+imagename
-            os.remove(imagefilename)
+            if os.path.exists(imagefilename):
+                os.remove(imagefilename)
             #Remove info from project
             o["imagelist"].remove(o["imagelist"][imageindex])
             f.seek(0)

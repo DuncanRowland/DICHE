@@ -1,4 +1,4 @@
-#rm logs/access.log
+rm logs/access.log
 rm logs/http.log
 rm logs/https.log
 killall python
