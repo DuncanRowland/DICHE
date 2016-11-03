@@ -1,8 +1,8 @@
-rm log.diche log.dichehttp log.dichehttps
+#rm logs/access.log
+rm logs/http.log
+rm logs/https.log
 killall python
 source ENV/bin/activate
-echo "<PRE>" > static/log.html
-nohup python ./dichehttp.py > log.dichehttp &
-nohup python ./dichehttps.py > log.dichehttps &
-
+nohup python ./dichehttp.py > logs/http.log &
+nohup python ./dichehttps.py > logs/https.log &
 

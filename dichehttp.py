@@ -13,7 +13,7 @@ import time
 import random
 import subprocess
 import logging
-from secrets import APP_KEY,APP_SECRET,COOKIE_SECRET
+from secrets import APP_KEY,APP_SECRET,COOKIE_SECRET,ADMIN1,ADMIN2
 
 class LandingHandler(tornado.web.RequestHandler):
     def initialize(self):
@@ -74,7 +74,7 @@ class MenuHandler(tornado.web.RequestHandler):
         self.enabled_menu_ids = {'menuitem_settings','menuitem_logout'}
         if _project_is_selected: self.enabled_menu_ids.update(['menuitem_sounds'])
         if self.audio_is_available: self.enabled_menu_ids.update(['menuitem_words','menuitem_pictures','menuitem_render'])
-        #Logging (only start logging when project selected)
+        #Logging (only logs when project selected)
         try:
            logging.log(100,'"'+self.account_id+'","'+self.selected_project+'","'+self.request.uri+'"')
         except:
@@ -160,6 +160,16 @@ class InitUserHandler(MenuHandler):
         if not os.path.exists(user_path):
             os.makedirs(user_path, exist_ok=False)
         self.redirect("/")
+
+class LogHandler(tornado.web.RequestHandler):
+   def get(self):
+        _account_id = tornado.escape.to_basestring(self.get_secure_cookie('account_id'))
+        if not _account_id or (_account_id!=ADMIN1 and _account_id!=ADMIN2):
+            self.send_error(404)
+            return
+        self.write("<PRE>")
+        with open("logs/access.log", 'r') as f:
+            self.write(f.read())
 
 class DataHandler(tornado.web.RequestHandler):
    def initialize(self):
@@ -435,14 +445,15 @@ def make_app():
         (r"/userfiles/(.*)", tornado.web.StaticFileHandler, {'path':'userfiles'}),
         (r"/render", RenderHandler),
         (r"/logout", LogoutHandler),
+        (r"/log", LogHandler),
         (r"/robots.txt", RobotsHandler),
         (r"/favicon.ico()", tornado.web.StaticFileHandler, {'path':'static/images/fav/favicon.ico'}),
         (r"/", LandingHandler),
     ],debug=False, cookie_secret=COOKIE_SECRET)
 
 if __name__ == "__main__":
-    logging.basicConfig(level=0, #100
-                        filename="static/log.html",
+    logging.basicConfig(level=0, #100,
+                        filename="logs/access.log",
                         format='%(asctime)s%(message)s',
                         datefmt='%m/%d/%Y,%H:%M:%S,')
     #tornado.options.parse_command_line()
