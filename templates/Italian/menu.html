@@ -1,0 +1,114 @@
+{% autoescape None %}
+<body>
+<div id="overlaylong" class="overlaylong">
+  <div id="busyspinner" class="wraptocenter">
+    <img src="static/images/busy.gif"></img>
+  </div>
+</div>
+<div id="overlayshort" class="overlayshort">
+</div>
+<div id="mySidenav" class="sidenav">
+  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+<br>  
+<br>
+<br>
+  <span id="menuitem_settings-null">Settings</span>
+  <a id="menuitem_settings-link" style="display: none;" href="javascript:void(0)" onclick="openPage('/settings')">Settings</a>
+  <span id="menuitem_sounds-null">Sounds</span>
+  <a id="menuitem_sounds-link" style="display: none;" href="javascript:void(0)" onclick="openPage('/sounds')">Sounds</a>
+  <span id="menuitem_words-null">Words</span>
+  <a id="menuitem_words-link" style="display: none;" href="javascript:void(0)" onclick="openPage('/words')">Words</a>
+  <span id="menuitem_pictures-null">Pictures</span>
+  <a id="menuitem_pictures-link" style="display: none;" href="javascript:void(0)" onclick="openPage('/pictures')">Pictures</a>
+  <span id="menuitem_render-null">Render</span>
+  <a id="menuitem_render-link" style="display: none;" href="javascript:void(0)" onclick="openPage('/render')">Render</a>
+  <span id="menuitem_logout-null">Logout</span>
+  <a id="menuitem_logout-link" style="display: none;" href="javascript:void(0)" onclick="openPage('/logout')">Logout</a>
+</div>
+
+<div id="topbar" style="height:50px">
+<span style="float:left;padding-top:2px">
+  <a target="_blank" href="http://www.diche-project.eu/">
+    <img style="width:90px;vertical-align:top" src="static/images/DICHE-logo-bf1f1f.svg"></img>
+  </a>
+</span>
+<span style="float:right;font-size:30px;width:1.25em;cursor:pointer" onclick="openNav()"><img style="vertical-align:center" src="static/images/icon-menu.svg"></span>
+<span style="float:right;height:30px;padding-top:13px;padding-right:30px">{{familar_name}}:I</span>
+</div>
+<!--Help Popup-->
+{{helptext_html}}
+<!--Scripts-->
+<script>
+//Cookie Utilities
+function getCookie(name) {
+    var value = "; " + document.cookie;
+    var parts = value.split("; " + name + "=");
+    if (parts.length == 2) return parts.pop().split(";").shift();
+}
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+//Side Nav Init
+function openNav() {
+    document.getElementById("mySidenav").style.width = "200px";
+}
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+}
+function openPage(path) {
+   closeNav();
+   window.location.replace(path);
+}
+$(document).ready(function(){
+{% for id in enabled_menu_ids %}
+   $("#{{id}}-null").hide()
+   $("#{{id}}-link").show()
+{% end %}
+
+//Tutorial Popup
+if(getCookie('show_tutorials')==undefined) {
+   $.ajax({
+      url: '/projectitem?showtuts',
+      type: 'GET',
+      dataType: 'json',
+      beforeSend: function() { $("#overlayshort").show(); },
+      complete: function(){ $("#overlayshort").hide(); },
+      success: function(data) {
+         var showTuts = data["showtuts"];
+         setCookie('show_tutorials',showTuts,30);
+         location.reload();
+      },
+      failure: function(data) {
+         alert('Failed load tutorial setting');
+      }
+   });
+};
+
+if(getCookie('show_tutorials')=='true'){
+   $( "#dialog-message" ).dialog({
+      modal: true,
+      buttons: {
+         Ok:{
+            class: "centerButton",
+            text: "Ok",
+            click: function() {
+               $(this).dialog("close");
+               $("#contents").show();
+            }
+         }
+      }
+   });
+} else {
+   $("#dialog-message").hide();
+   $("#contents").show();
+}
+});
+</script>
+<!--Embed Contents-->
+<span id="contents" style="display:none">{{contents_html}}</span>
+</body>
+</html> 
+

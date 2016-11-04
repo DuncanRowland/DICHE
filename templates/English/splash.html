@@ -1,0 +1,43 @@
+<body style="background-color:#ffffff;">
+<div style="text-align:center;padding-top:80px;padding-left:8px;height:100px;"><img height=100% src="static/images/DICHE-logo.svg"></img></div><br>
+<a href="javascript:void(0)" onclick=guardedLogin()>
+<div style="width:30%;text-align:center;padding:8px;margin:0 auto;border-radius:25px;border: 2px solid #e0e0e0;">
+   <span style="color:#005976;padding:2px">Login with</span>
+   <img style="vertical-align:top" height=20px src="static/images/dropboxblue.svg"></img>
+</div>
+</a>
+<span id="splashfooter">This WebApp requires 'Cookies' to run. Please see
+<a style="color:#00a" target="_blank" href="/static/cookiespolicy.txt">our policy</a>
+for more details.<br>
+This project has received funding from the European Commission Erasmus+ Programme under grant agreement no 2015-1-NL01-KA201-009021.
+<img height="8px" src="/static/images/flag_of_europe.svg"></img>
+</span>
+<script>
+function guardedLogin(){
+   if(checkCookie()) {
+      window.location.replace('/auth');
+   }
+}
+function checkCookie(){
+    var cookieEnabled=(navigator.cookieEnabled)? true : false;
+    if (typeof navigator.cookieEnabled=="undefined" && !cookieEnabled){ 
+        document.cookie="testcookie";
+        cookieEnabled=(document.cookie.indexOf("testcookie")!=-1)? true : false;
+    }
+    if(cookieEnabled)return true;
+    alert("This WebApp requires cookies to be enabled in your browser.");
+    return false;
+}
+$(document).ready(function(){
+  if (/Edge\/1/i.test(navigator.userAgent)){
+     alert("Sorry, Microsoft's Edge Browser is not supported.");
+   }
+   checkCookie();
+});
+</script>
+<noscript>
+<center><h1><font color="FF0000">This WebApp requires Javascript to be enabled in your browser.</h1></center>
+</noscript>
+</body>
+</html> 
+

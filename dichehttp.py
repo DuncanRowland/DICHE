@@ -17,7 +17,7 @@ from secrets import APP_KEY,APP_SECRET,COOKIE_SECRET,ADMIN1,ADMIN2
 
 class LandingHandler(tornado.web.RequestHandler):
     def initialize(self):
-        self.loader = tornado.template.Loader("templates")
+        self.loader = tornado.template.Loader("templates/English")
         self.template_header = self.loader.load("header.html")
         self.template_splash = self.loader.load("splash.html")
 
@@ -31,7 +31,10 @@ class LandingHandler(tornado.web.RequestHandler):
 
 class MenuHandler(tornado.web.RequestHandler):
     def initialize(self):
-        self.loader = tornado.template.Loader("templates")
+        lang=tornado.escape.to_basestring(self.get_cookie('language'))
+        if not lang or (lang!='English' and lang!='Dutch' and lang!='Italian'):
+          lang='English'
+        self.loader = tornado.template.Loader("templates/"+lang)
         self.template_header = self.loader.load("header.html")
         self.template_menu = self.loader.load("menu.html")
         self.helptext_html = None
@@ -185,8 +188,11 @@ class DataHandler(tornado.web.RequestHandler):
 class InitProjectHandler(DataHandler):
     def get(self):
         os.makedirs(self.project_path, exist_ok=False)
+        lang=tornado.escape.to_basestring(self.get_cookie('language'))
+        if not lang or (lang!='English' and lang!='Dutch' and lang!='Italian'):
+          lang='English'
         with open(self.project_filename, 'w') as f:
-            init_project_object = {'showtuts':'true','account_id':self.account_id,'imagelist':[]}
+            init_project_object = {'showtuts':'true','lang':lang,'account_id':self.account_id,'imagelist':[]}
             f.write(json.dumps(init_project_object))
             f.close()
 
@@ -202,7 +208,7 @@ class ProjectItemsHandler(DataHandler):
 class ProjectItemHandler(DataHandler):
     def get(self):
         if not hasattr(self, 'project_filename'):
-            self.write(json.dumps({'showtuts':'true'}))
+            self.write(json.dumps({'showtuts':'true','lang':'English'})) #If no current project
             return
         with open(self.project_filename, 'r+') as f:
             text = f.read()

@@ -1,0 +1,272 @@
+<!-- Swiper -->
+<div class="swiper-container">
+    <div class="swiper-wrapper"></div>
+    <div class="swiper-pagination swiper-pagination-white"></div>
+    <div class="swiper-button-next swiper-button-white"></div>
+    <div class="swiper-button-prev swiper-button-white"></div>
+</div>
+<br>
+<center>
+<button id="RemoveButton" class="ui-widget-content ui-corner-all">
+   Remove
+</button>
+&nbsp&nbsp
+<button id="AddButton" class="ui-widget-content ui-corner-all">
+   <img class="dbbuttonimg" src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbspAdd...
+</button>
+</center>
+<br>
+<div id="audiospan" style="font-size:80%"></div>
+
+<!-- jPlayer -->
+<div class="responsive-wrapper">
+    <div id="jquery_jplayer_audio_1" class="jp-jplayer"></div>
+    <div id="jp_container_audio_1" class="jp-flat-audio" role="application" aria-label="media player">
+        <div class="jp-play-control jp-control">
+            <button class="jp-play jp-button" role="button" aria-label="play" tabindex="0"></button>
+        </div>
+        <div class="jp-bar">
+            <div class="jp-seek-bar jp-seek-bar-display"></div>
+            <div class="jp-seek-bar">
+                <div class="jp-play-bar"></div>
+                <div class="jp-details"><span class="jp-title" aria-label="title"></span></div>
+                <div class="jp-timing"><span class="jp-duration" role="timer" aria-label="duration"></span></div>
+            </div>
+        </div>
+        <div class="jp-no-solution">
+            Media Player Error<br />
+            Update your browser or Flash plugin
+        </div>
+    </div>
+</div>
+<!-- end jPlayer -->
+
+<script>
+//Image List Sorter utility
+function sortImageList() {
+    project_object['imagelist'].sort(function(a,b) {
+        return a.imagetime - b.imagetime;
+    });
+}
+//Timeline utilities
+var jPlayerCurrentTime=0;
+var jPlayerCurrentIndex=0;
+var jPlayerPaused=true;
+function addImageAtTimeNow(url,name) {
+    var clash=true;
+    while(clash) {
+       clash=false;
+       for (var i=0;i<project_object['imagelist'].length; i++)
+          if(project_object['imagelist'][i]["imagetime"]==jPlayerCurrentTime) clash=true;
+       if(clash)jPlayerCurrentTime+=0.5;
+    }
+    $.ajax({
+        url: 'imageset',
+        beforeSend: function() { $("#overlaylong").show(); },
+        complete: function(){ $("#overlaylong").hide(); },
+        type: 'POST',
+        data: {'fileurl':url, 'imagename':name, 'imagetime':jPlayerCurrentTime},
+        success: function(data) {
+            //update local copy of project_object
+            project_object['imagelist'].push({'imagetime':jPlayerCurrentTime,'imagename':data});
+            sortImageList();
+            updateSwiper();
+        },
+        failure: function(data) {
+            alert('Failed to load image');
+        }
+    });
+}
+function removeCurrentImage() {
+    if(project_object['imagelist'].length==0) return;
+    jPlayerCurrentIndex=calcIndex();
+    $.ajax({
+        url: 'imageset',
+        beforeSend: function() { $("#overlayshort").show(); },
+        complete: function(){ $("#overlayshort").hide(); },
+        type: 'DELETE',
+        data: {'index':jPlayerCurrentIndex},
+        success: function(data) {
+            //update local copy of project_object
+            project_object['imagelist'].splice(jPlayerCurrentIndex,1);
+            updateSwiper();
+        },
+        failure: function(data) {
+            alert('Failed to save update');
+        }
+    });
+}
+//Initialize Image Swiper
+var swiper = new Swiper('.swiper-container', {
+    pagination: '.swiper-pagination',
+    paginationClickable: true,
+    nextButton: '.swiper-button-next',
+    prevButton: '.swiper-button-prev',
+    spaceBetween: 30,
+    effect: 'fade',
+    onSlideChangeStart: function(s) {
+        if(jPlayerPaused) {
+            if(s.activeIndex==0) {
+               jPlayerCurrentTime=0;
+            } else {
+               jPlayerCurrentTime=Number(project_object['imagelist'][s.activeIndex]['imagetime']);
+            }
+            $('#jquery_jplayer_audio_1').jPlayer("pause", jPlayerCurrentTime);
+        }
+    }
+});
+//Update Image Swiper (via ajax)
+function calcIndex() {
+    ri=0;
+    for(i=0;i<project_object['imagelist'].length;i++) {
+        if(jPlayerCurrentTime>=project_object['imagelist'][i]['imagetime']) {
+           ri=i;
+        }
+    }
+    return ri;
+}
+function updateSwiper() {
+        projecturl = "/userfiles/" +
+                      project_object['account_id'] + "/" +
+                      getCookie("selected_project") + "/"
+        swiper.removeAllSlides();
+        for(i=0;i<project_object['imagelist'].length;i++) {
+           imagelistitem = project_object['imagelist'][i];
+           imageurl = projecturl+imagelistitem['imagename'];
+           swiper.appendSlide('<div class="swiper-slide" style="background-image:url('+imageurl+')"></div>')
+        }
+        jPlayerCurrentIndex=calcIndex();
+        swiper.slideTo(jPlayerCurrentIndex);
+        swiper.update();
+}
+$(document).ready(function() {
+    $.ajax({
+        url: 'projectitems',
+        type: 'GET',
+        beforeSend: function() { $("#overlayshort").show(); },
+        complete: function(){ $("#overlayshort").hide(); },
+        dataType: 'json',
+        success: function(data) {
+            project_object = data;
+            sortImageList();
+            //Initialise Audio Player
+            $("#jquery_jplayer_audio_1").jPlayer({
+                loadeddata: function(event){ // calls after setting the song duration
+                   $.ajax({
+                      url: 'projectitem?duration='+event.jPlayer.status.duration,
+                      type: 'PUT',
+                      beforeSend: function() { $("#overlayshort").show(); },
+                      complete: function(){ $("#overlayshort").hide(); },
+                      success: function(data) { //Remove any images that are beyond the end of audio
+                      var allImagesInScope = true;
+                      for (var i=0;i<project_object['imagelist'].length; i++)
+                         if(project_object['imagelist'][i]["imagetime"]>event.jPlayer.status.duration) {
+                            $.ajax({
+                               url: 'imageset',
+                               type: 'DELETE',
+                               data: {'index':i},
+                               failure: function(data) { alert('Failed to update scope'); }
+                            });
+                            allImagesInScope=false;
+                         }
+                      if(!allImagesInScope) location.reload();
+                      },
+                      failure: function(data) {
+                         alert('Failed to save duration');
+                      }
+                   });
+                },
+                playing: function(event) {
+                   jPlayerPaused=false;
+                },
+                pause: function(event) {
+                   jPlayerPaused=true;
+                   jPlayerCurrentTime = event.jPlayer.status.currentTime;
+                },
+                ended: function(event) {
+                   jPlayerCurrentTime = 0;
+                   jPlayerCurrentIndex = 0;
+                   swiper.slideTo(0);
+                },
+                ready: function(event) {
+                    projecturl = "/userfiles/" +
+                        project_object['account_id'] + "/" +
+                        getCookie("selected_project") + "/"
+                    $(this).jPlayer("setMedia", {
+                        title: project_object['audiofilename'],
+                        mp3: projecturl + "DICHE.mp3?var="+(new Date()).getTime()
+                    });
+                },
+                play: function() { // Avoid multiple jPlayers playing together.
+                    $(this).jPlayer("pauseOthers");
+                },
+                timeFormat: {
+                    padMin: false
+                },
+                swfPath: "js",
+                supplied: "mp3",
+                cssSelectorAncestor: "#jp_container_audio_1",
+                useStateClassSkin: true,
+                autoBlur: false,
+                smoothPlayBar: true,
+                remainingDuration: true,
+                keyEnabled: true,
+                keyBindings: {
+                    // Disable some of the default key controls
+                    loop: null,
+                    muted: null,
+                    volumeUp: null,
+                    volumeDown: null
+                },
+                wmode: "window"
+            });
+            //Init images (Update swiper)
+            updateSwiper();
+        } //End of ajax success
+    }); //End ajax
+    $('#AddButton').button().on( "click", function() {
+        options = {
+            success: function(files) {
+                addImageAtTimeNow(files[0].link,files[0].name);
+            },
+            cancel: function() {},
+            linkType: "direct", //"preview", // or "direct"
+            multiselect: false, // or true
+            extensions: ['images'],
+        };
+        Dropbox.choose(options);
+    });
+    $('#RemoveButton').button().on( "click", function() {
+        removeCurrentImage();
+    });
+//Link time changes in audio player to swiper image
+    var lasteventtime = (new Date()).getTime();
+    $('#jquery_jplayer_audio_1').bind($.jPlayer.event.timeupdate, function(event) {
+        if(jPlayerPaused)return;
+        var thiseventtime = (new Date()).getTime();
+        if((thiseventtime-lasteventtime)<100) return; //Prevent double trigger (250ms for player)
+        lasteventtime = thiseventtime;
+        //console.log(thiseventtime);
+        jPlayerCurrentTime=event.jPlayer.status.currentTime;
+        newIndex=calcIndex();
+        if(jPlayerCurrentIndex!=newIndex) {
+            swiper.slideTo(newIndex);
+            jPlayerCurrentIndex=newIndex;
+        }
+    });
+    $('#jquery_jplayer_audio_1').bind($.jPlayer.event.seeked, function(event) {
+        var thiseventtime = (new Date()).getTime();
+        if((thiseventtime-lasteventtime)<100) return; //Prevent double trigger (250ms for player)
+        lasteventtime = thiseventtime;
+        //console.log(thiseventtime);
+        jPlayerCurrentTime=event.jPlayer.status.currentTime;
+        newIndex=calcIndex();
+        if(jPlayerCurrentIndex!=newIndex) {
+            swiper.slideTo(newIndex);
+            jPlayerCurrentIndex=newIndex;
+        }
+    });
+    $("#contents").show() //Video wont setup properly if hidden
+}); //End of document ready
+</script>
+

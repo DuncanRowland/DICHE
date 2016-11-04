@@ -1,0 +1,213 @@
+<script>
+//Document Ready
+$(document).ready(function(){
+   //Utility to make sure selected_project cookie matches project_settings
+   setCookieToProject = function(reload) {
+     $.ajax({
+       url: 'projectitem?showtuts&lang&ver='+$.now(),
+       type: 'GET',
+       dataType: 'json',
+       beforeSend: function() { $("#overlayshort").show(); },
+       complete: function(){ $("#overlayshort").hide(); },
+       success: function(data) {
+         if(data['showtuts']!=getCookie('show_tutorials')) {
+           setCookie('show_tutorials',data['showtuts'],30);
+         }
+         if(data['lang']!=getCookie('language')) {
+           setCookie('language',data['lang'],30);
+         }
+         if(reload)location.reload();
+       },
+       failure: function(data) {
+         alert('Failed to get tutorial setting');
+       }
+     });
+   }
+
+   //Project Selecter Menu
+   $("#selectmenu").selectmenu({
+      change: function( event, ui ) {
+         setCookie('selected_project',ui.item.value,30);
+         setCookieToProject(true);
+      },
+      width: 200
+   });
+
+   ////Init the Tutorial Language Selecter Menu Callback
+   $("#selectlanguagemenu").selectmenu({
+      change: function( event, ui ) {
+      $.ajax({
+        url: 'projectitem?lang='+ui.item.value,
+        type: 'PUT',
+        beforeSend: function() { $("#overlayshort").show(); },
+        complete: function(){ $("#overlayshort").hide(); },
+        success: function(data) {
+           setCookie('language',ui.item.value,30);
+           setCookieToProject(true);
+        },
+        failure: function(data) {
+           alert('Failed to update tutorial setting');
+        }
+      });
+      },
+      width: 200
+   });
+
+   //Init the Show Tutorial Callback
+   $("#tutorial-checkbox").checkboxradio().click(function(){
+      var showTuts=$('#tutorial-checkbox').prop('checked');
+      $.ajax({
+        url: 'projectitem?showtuts='+showTuts,
+        type: 'PUT',
+        beforeSend: function() { $("#overlayshort").show(); },
+        complete: function(){ $("#overlayshort").hide(); },
+        success: function(data) {
+           setCookie('show_tutorials',showTuts,30)
+        },
+        failure: function(data) {
+           alert('Failed to update tutorial setting');
+        }
+      });
+   });
+
+   //Init the tutorial state
+   setCookieToProject(false);
+   var showTuts=getCookie('show_tutorials')=='true';
+   $('#tutorial-checkbox').prop('checked', showTuts)
+                          .prop("disabled", getCookie('selected_project')==undefined)
+                          .checkboxradio('refresh', true);
+   var langTut=getCookie('language');
+   $('#selectlanguagemenu').val(langTut)
+                           .prop("disabled", getCookie('selected_project')==undefined)
+                           .selectmenu('refresh', true);
+
+   //Init dialog
+      var dialog, form,
+          projname = $( "#projname" ),
+          tips = $( ".validateTips" );
+ 
+      function updateTips( t ) {
+         tips
+            .text( t )
+            .addClass( "ui-state-highlight" );
+         setTimeout(function() {
+            tips.removeClass( "ui-state-highlight", 1500 );
+         }, 500 );
+      }
+ 
+      function sanityCheck() {
+         if ( projname.val().length == 0 ) return false;
+         if ( projname.val().length > 20 ) {
+            projname.addClass( "ui-state-error" );
+            updateTips( "Max length 20 characters" );
+            return false;
+         }
+         if ( !( /^([0-9a-zA-Z-])+$/.test( projname.val() ) ) ) {
+            projname.addClass( "ui-state-error" );
+            updateTips( "Letters, - and numbers only" );
+            return false;
+         }
+         projoptions = document.getElementById('selectmenu').options;
+         for(optionindex=0; optionindex<projoptions.length; optionindex++) {
+            if ( projname.val() == projoptions[optionindex].value ) {
+               updateTips( "Project aready exists" );
+               return false;
+            }
+         };
+         return true;
+      }
+ 
+      function createProject() {
+         var valid = true;
+         projname.removeClass( "ui-state-error" );
+         projname.val(projname.val().trim())
+         valid = sanityCheck()
+         if ( valid ) {
+            pn = projname.val();
+            setCookie('selected_project',pn,30);
+            dialog.dialog( "close" );
+            $.ajax({
+               url: 'initproject?ver='+$.now(),
+               type: 'GET',
+               beforeSend: function() { $("#overlayshort").show(); },
+               complete: function(){ $("#overlayshort").hide(); },
+               success: function(data) {
+                  $("#selectmenu").prepend($('<option/>',{value:pn,text:pn})).val(pn).selectmenu('refresh', true);
+                  setCookieToProject(true);
+               },
+               failure: function(data) {
+                  alert('Failed to init project');
+               }
+            });
+         }
+         return valid;
+      }
+ 
+      dialog = $( "#dialog-form" ).dialog({
+         autoOpen: false,
+         height: 250,
+         width: 250,
+         modal: true,
+         buttons: {
+            Create:{ 
+               class: 'leftButton',
+               text: 'Create',
+               click : createProject
+            },
+            Cancel: function() {
+               dialog.dialog( "close" );
+            }
+         },
+         close: function() {
+            form[ 0 ].reset();
+            projname.removeClass( "ui-state-error" );
+         }
+      });
+ 
+      form = dialog.find( "form" ).on( "submit", function( event ) {
+         event.preventDefault();
+         createProject();
+      });
+ 
+      $( "#create-project" ).button().on( "click", function() {
+         dialog.dialog( "open" );
+      });
+
+}); //End Document Ready
+</script>
+
+<div id="dialog-form" title="Create new project">
+  <p class="validateTips">Enter new project name:</p>
+  <form>
+    <fieldset>
+      <input type="text" id="projname" placeholder="New-Name" class="text ui-widget-content ui-corner-all">
+      <!-- Allow form submission with keyboard without duplicating the dialog button -->
+      <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+    </fieldset>
+  </form>
+</div>
+
+<!-- GUI -->
+<center>
+<h3>Project Name</h3>
+<select id="selectmenu">
+    <option value="-1" disabled selected>Select Project</option>
+    {% for p in projects %}
+       <option value="{{p}}" {% if p==selected_project %}selected{% end %}>{{p}}</option>
+    {% end %}
+</select>
+<br><br>
+<button id="create-project">New...</button>
+<br><br><br>
+<form id="tutorialForm">
+    <select id="selectlanguagemenu">
+      <option value="-1" disabled selected>Change Language?</option>
+      <option value="English">English</option>
+      <option value="Dutch">Dutch</option>
+      <option value="Italian">Italian</option>
+    </select>
+  <br><br>
+    <label for="tutorial-checkbox">Show Tutorial?</label>
+    <input type="checkbox" name="tutorial-checkbox" id="tutorial-checkbox" value="yes">
+</form>
+</center>

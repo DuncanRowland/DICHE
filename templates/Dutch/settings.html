@@ -4,7 +4,7 @@ $(document).ready(function(){
    //Utility to make sure selected_project cookie matches project_settings
    setCookieToProject = function(reload) {
      $.ajax({
-       url: 'projectitem?showtuts&ver='+$.now(),
+       url: 'projectitem?showtuts&lang&ver='+$.now(),
        type: 'GET',
        dataType: 'json',
        beforeSend: function() { $("#overlayshort").show(); },
@@ -12,6 +12,9 @@ $(document).ready(function(){
        success: function(data) {
          if(data['showtuts']!=getCookie('show_tutorials')) {
            setCookie('show_tutorials',data['showtuts'],30);
+         }
+         if(data['lang']!=getCookie('language')) {
+           setCookie('language',data['lang'],30);
          }
          if(reload)location.reload();
        },
@@ -30,7 +33,27 @@ $(document).ready(function(){
       width: 200
    });
 
-   //Init the tutorial callback
+   ////Init the Tutorial Language Selecter Menu Callback
+   $("#selectlanguagemenu").selectmenu({
+      change: function( event, ui ) {
+      $.ajax({
+        url: 'projectitem?lang='+ui.item.value,
+        type: 'PUT',
+        beforeSend: function() { $("#overlayshort").show(); },
+        complete: function(){ $("#overlayshort").hide(); },
+        success: function(data) {
+           setCookie('language',ui.item.value,30);
+           setCookieToProject(true);
+        },
+        failure: function(data) {
+           alert('Failed to update tutorial setting');
+        }
+      });
+      },
+      width: 200
+   });
+
+   //Init the Show Tutorial Callback
    $("#tutorial-checkbox").checkboxradio().click(function(){
       var showTuts=$('#tutorial-checkbox').prop('checked');
       $.ajax({
@@ -46,12 +69,17 @@ $(document).ready(function(){
         }
       });
    });
+
    //Init the tutorial state
    setCookieToProject(false);
    var showTuts=getCookie('show_tutorials')=='true';
    $('#tutorial-checkbox').prop('checked', showTuts)
                           .prop("disabled", getCookie('selected_project')==undefined)
                           .checkboxradio('refresh', true);
+   var langTut=getCookie('language');
+   $('#selectlanguagemenu').val(langTut)
+                           .prop("disabled", getCookie('selected_project')==undefined)
+                           .selectmenu('refresh', true);
 
    //Init dialog
       var dialog, form,
@@ -172,9 +200,14 @@ $(document).ready(function(){
 <button id="create-project">New...</button>
 <br><br><br>
 <form id="tutorialForm">
-  <fieldset>
+    <select id="selectlanguagemenu">
+      <option value="-1" disabled selected>Change Language?</option>
+      <option value="English">English</option>
+      <option value="Dutch">Dutch</option>
+      <option value="Italian">Italian</option>
+    </select>
+  <br><br>
     <label for="tutorial-checkbox">Show Tutorial?</label>
     <input type="checkbox" name="tutorial-checkbox" id="tutorial-checkbox" value="yes">
-  </fieldset>
 </form>
 </center>

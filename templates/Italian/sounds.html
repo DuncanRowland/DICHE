@@ -1,0 +1,62 @@
+<!-- GUI -->
+<br>
+<center>
+<h3>Audio File</h3>
+<br>
+<button id="dbbutton" class="ui-widget-content ui-corner-all">
+   <img class="dbbuttonimg" src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbspLoad...
+</button>
+<br><br>
+<div id="audiospan" style="font-size:80%"></div>
+</center>
+<!--Scripts -->
+<script>
+$(document).ready(function(){
+$( "#dbbutton" ).button().on( "click", function() {
+   Dropbox.choose(options);
+});
+//Setup dropbox button
+options = {
+    success: function(files) {
+          $.ajax({
+             url: 'setaudio',
+             type: 'POST',
+             data: "fileurl="+files[0].link,
+             beforeSend: function() { $("#overlaylong").show(); },
+             complete: function(){ $("#overlaylong").hide(); },
+             success: function(data) {
+                $.ajax({
+                   url:'projectitem?audiofilename='+files[0].name,
+                   type: 'PUT',
+                   beforeSend: function() { $("#overlayshort").show(); },
+                   complete: function(){ $("#overlayshort").hide(); },
+                   success: function(){ $("#audiospan").text("("+files[0].name+")"); }
+                });
+                location.reload();
+             },
+             failure: function(data) {
+                alert('Failed to load audio');
+             }
+          });
+       },
+       cancel: function() {
+       },
+       linkType: "direct", //"preview"
+       multiselect: false, // or true
+       extensions: ['audio','amr'],
+   };
+   //Load existing audiofilename
+   $.ajax({
+      url:'projectitem?audiofilename&ver='+$.now(),
+      type: 'GET',
+      dataType: 'json',
+      beforeSend: function() { $("#overlayshort").show(); },
+      complete: function(){ $("#overlayshort").hide(); },
+      success: function(data) {
+         if(data['audiofilename']) {
+            $("#audiospan").text("("+data['audiofilename']+")");
+         }
+      }
+   });
+});
+</script>

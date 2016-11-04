@@ -1,0 +1,110 @@
+<script>
+$(document).ready(function(){
+    $.ajax({
+        url: 'projectitems?ver='+$.now(),
+        type: 'GET',
+        dataType: 'json',
+        beforeSend: function() { $("#overlayshort").show(); },
+        complete: function(){ $("#overlayshort").hide(); },
+        success: function(data) {
+            project_object = data;
+        }
+    });
+});
+</script>
+
+  <style>
+    label, input { display:block; }
+    input.text { margin-bottom:12px; width:95%; padding: .4em; }
+    fieldset { padding:0; border:0; margin-top:25px; }
+    h1 { font-size: 1.2em; margin: .6em 0; }
+    .ui-dialog .ui-state-error { padding: .3em; }
+    .validateTips { border: 1px solid transparent; padding: 0.3em; }
+    .leftButton
+    {
+        margin-right: 40px !important;
+    }
+  </style>
+
+  <script>
+  $( function() {
+    var words = $("#words");
+    var tips = $(".validateTips");
+    var dialog = $("#dialog-form").dialog({
+      autoOpen: false,
+      height: 275,
+      width: 275,
+      modal: true,
+      open: function() { $("#dbsave").blur(); },
+      buttons: {
+        Create:{
+          class: 'leftButton',
+          html: "<img class='dbbuttonimg' src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbspSave...",
+          id: "dbsave",
+          click: function(){
+             var url = $("#wordsimage").attr("src");
+             var options = {
+                success: function () {
+                   dialog.dialog( "close" );
+                },
+                progress: function (progress) {},
+                cancel: function () {},
+                error: function (errorMessage) {
+                   alert("Failed to save image:"+errorMessage);
+                }
+             };
+             Dropbox.save(url, "Words.jpg" , options);
+           }
+        },
+        Cancel: function() {
+          dialog.dialog("close");
+        }
+      },
+      close: function() {}
+    });
+ 
+    $( "#create-image" ).button().on( "click", function() {
+       if ( !( /^([0-9a-zA-Z-\n\r\s])*$/.test( words.val() ) ) ) {
+          words.addClass( "ui-state-error" );
+          tips
+             .text( "Letters, - and numbers only" )
+             .addClass( "ui-state-highlight" );
+          setTimeout(function() {
+             tips.removeClass( "ui-state-highlight", 1500 );
+          }, 500 );
+      } else {
+          words.removeClass( "ui-state-error" );
+          $.ajax({
+             url: 'createimage',
+             type: 'POST',
+             beforeSend: function() { $("#overlaylong").show(); },
+             complete: function(){ $("#overlaylong").hide(); },
+             data: {'words':words.val()},
+             success: function(data) {
+               projecturl = "http://diche-app.eu.org/userfiles/" +
+                   project_object['account_id'] + "/" +
+                   getCookie("selected_project") + "/"
+               $("#wordsimage").attr("src",projecturl+"words.jpg?var="+(new Date()).getTime());
+               dialog.dialog("open");
+             },
+             failure: function(data) {
+               alert('Failed to load image');
+             }
+          });
+      }
+    });
+  } );
+  </script>
+
+<div id="dialog-form" title="Save to Dropbox">
+<img id="wordsimage" style="width:100%;height=auto;"></img>
+</div>
+
+<!-- GUI -->
+<center>
+<h3>Title and Credits</h3>
+<p class="validateTips">Enter Text for Image</p>
+<textarea rows="5" cols="30" id="words" class="ui-widget ui-state-default ui-corner-all"></textarea>
+<br><br>
+<button id="create-image">Create...</button>
+</center>
