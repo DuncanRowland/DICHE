@@ -96,9 +96,11 @@ if(getCookie('show_tutorials')=='true'){
             text: "Ok",
             click: function() {
                $(this).dialog("close");
-               $("#contents").show();
             }
          }
+      },
+      close: function( event, ui ) {
+         $("#contents").show();
       }
    });
 } else {

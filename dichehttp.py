@@ -282,6 +282,7 @@ class ImageSetHandler(DataHandler):
         newimagename=str(int(time.time()*1000))+str(random.randint(1000,9999))+".jpg"
         newimagefilename = self.project_path+newimagename
         params = ['convert',
+                  '-auto-orient',
                   '-resize','1280x720',
                   srcimagefilename,
                   '-background','black',
@@ -433,7 +434,14 @@ class AuthCallbackHandler(tornado.web.RequestHandler):
 
 class RobotsHandler(tornado.web.RequestHandler):
    def get(self):
-      self.write("User-agent: *\r\nDisallow: /\r\n");
+      self.write("User-agent: *\r\nDisallow: /\r\n")
+
+class DropHandler(tornado.web.RequestHandler):
+   def get(self,uri):
+      logging.log(100,"DROPPED:"+self.request.remote_ip+'('+uri+')')
+      #self.redirect('http'+uri,permanent=True)
+      subprocess.Popen(['./dropip.sh',self.request.remote_ip])
+      self.send_error(404)
 
 def make_app():
     return tornado.web.Application([
@@ -458,6 +466,8 @@ def make_app():
         (r"/log", LogHandler),
         (r"/robots.txt", RobotsHandler),
         (r"/favicon.ico()", tornado.web.StaticFileHandler, {'path':'static/images/fav/favicon.ico'}),
+        (r"http(.*)", DropHandler),
+        (r"/cgi(.*)", DropHandler),
         (r"/", LandingHandler),
     ],debug=False, cookie_secret=COOKIE_SECRET)
 
