@@ -38,6 +38,10 @@
 </button>
 &nbsp
 <button id="download" class="ui-widget-content ui-corner-all">Download</button>
+<br><br>
+<button id="smbutton" class="ui-widget-content ui-corner-all">
+   Complete<img class="smbuttonimg" src='/static/images/sm_monkeyhead_1colorgreen.png' />&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+</button>
 </span>
 </center>
 
@@ -58,6 +62,7 @@ $(document).ready(function() {
          });
       });
    }
+
    //Setup download button
    setup_download_button = function() {
       $('#download').button().click(function(event) {
@@ -86,6 +91,13 @@ $(document).ready(function() {
             }
          };
          Dropbox.save(videourl, "DICHE.mp4", options);
+      });
+   }
+
+   //Setup Survey Monkey button
+   setup_survey_monkey_button = function() {
+      $("#smbutton").button().on("click", function() {
+         alert("TODO: Will open survey link");
       });
    }
 
@@ -196,6 +208,8 @@ $(document).ready(function() {
                   setup_download_button();
                   //Dropbox saver button
                   setup_dropbox_saver_button();
+                  //Survey Monkey link
+                  setup_survey_monkey_button();
                   //Video Player
                   setup_videoplayer();
                   $('#dbsave').show();
