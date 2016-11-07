@@ -52,7 +52,7 @@ $(document).ready(function() {
 
    //Setup create button
    setup_create_button = function() {
-      $("#create-video").button().on("click", function() {
+      $("#create-video").button().css('width','110px').on("click", function() {
       $("#overlayshort").show();
          $.ajax({
             url: 'createvideo?ver='+$.now(),
@@ -65,7 +65,7 @@ $(document).ready(function() {
 
    //Setup download button
    setup_download_button = function() {
-      $('#download').button().click(function(event) {
+      $('#download').button().css('width','110px').click(function(event) {
          var pom = document.createElement('a');
          pom.setAttribute('href', videourl);
          pom.setAttribute('download', "DICHE.mp4");
@@ -81,7 +81,7 @@ $(document).ready(function() {
 
    //Setup Dropbox saver buttom
    setup_dropbox_saver_button = function() {
-      $("#dbbutton").button().on("click", function() {
+      $("#dbbutton").button().css('width','110px').on("click", function() {
          var options = {
             success: function() {},
             progress: function(progress) {},
