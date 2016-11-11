@@ -155,8 +155,11 @@ $(document).ready(function(){
                text: 'Create',
                click : createProject
             },
-            Cancel: function() {
-               dialog.dialog( "close" );
+            Cancel:{
+               text: 'Cancel',
+               click : function() {
+                  dialog.dialog( "close" );
+               }
             }
          },
          close: function() {
@@ -208,7 +211,7 @@ $(document).ready(function(){
       <option value="Italian">Italian</option>
     </select>
   <br><br>
-    <label for="tutorial-checkbox">Show Tutorial?</label>
+    <label for="tutorial-checkbox">Show Tutoial?</label>
     <input type="checkbox" name="tutorial-checkbox" id="tutorial-checkbox" value="yes">
 </form>
 </center>

@@ -152,11 +152,14 @@ $(document).ready(function(){
          buttons: {
             Create:{ 
                class: 'leftButton',
-               text: 'Create',
+               text: '@49',
                click : createProject
             },
-            Cancel: function() {
-               dialog.dialog( "close" );
+            Cancel:{
+               text: '@50',
+               click : function() {
+                  dialog.dialog( "close" );
+               }
             }
          },
          close: function() {

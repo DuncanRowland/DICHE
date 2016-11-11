@@ -251,7 +251,7 @@ $(document).ready(function() {
 
    //Allow render interrupt with cancel button
    setup_cancel_button = function() {
-   $('#busyspinner').append('<div><button id="cancel">Interrupt</button></div>');
+   $('#busyspinner').append('<div><button id="cancel">@51</button></div>');
    $('#cancel').button().on("click", function() {
       $(this).prop("disabled",true).button('refresh', true)
       $.ajax({
