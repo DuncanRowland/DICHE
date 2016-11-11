@@ -56,11 +56,8 @@ $(document).ready(function(){
              Dropbox.save(url, "Words.jpg" , options);
            }
         },
-        Cancel:{
-          text: '@50',
-          click: function() {
-            dialog.dialog("close");
-          }
+        Cancel: function() {
+          dialog.dialog("close");
         }
       },
       close: function() {}
