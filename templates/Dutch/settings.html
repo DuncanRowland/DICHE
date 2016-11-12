@@ -152,11 +152,11 @@ $(document).ready(function(){
          buttons: {
             Create:{ 
                class: 'leftButton',
-               text: '@49',
+               text: 'Start',
                click : createProject
             },
             Cancel:{
-               text: '@50',
+               text: 'Cancel',
                click : function() {
                   dialog.dialog( "close" );
                }
@@ -180,11 +180,11 @@ $(document).ready(function(){
 }); //End Document Ready
 </script>
 
-<div id="dialog-form" title="@26">
-  <p class="validateTips">@25</p>
+<div id="dialog-form" title="Start een nieuw project">
+  <p class="validateTips">Voeg een nieuwe projectnaam toe:</p>
   <form>
     <fieldset>
-      <input type="text" id="projname" placeholder="@27" class="text ui-widget-content ui-corner-all">
+      <input type="text" id="projname" placeholder="New-Name" class="text ui-widget-content ui-corner-all">
       <!-- Allow form submission with keyboard without duplicating the dialog button -->
       <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
     </fieldset>
@@ -193,25 +193,25 @@ $(document).ready(function(){
 
 <!-- GUI -->
 <center>
-<h3>@28</h3>
+<h3>Projectnaam</h3>
 <select id="selectmenu">
-    <option value="-1" disabled selected>@30</option>
+    <option value="-1" disabled selected>Select Project</option>
     {% for p in projects %}
        <option value="{{p}}" {% if p==selected_project %}selected{% end %}>{{p}}</option>
     {% end %}
 </select>
 <br><br>
-<button id="create-project">@29</button>
+<button id="create-project">Nieuw</button>
 <br><br><br>
 <form id="tutorialForm">
     <select id="selectlanguagemenu">
-      <option value="-1" disabled selected>@31</option>
-      <option value="English">@32</option>
-      <option value="Dutch">@33</option>
-      <option value="Italian">@34</option>
+      <option value="-1" disabled selected>Taal</option>
+      <option value="English">Engels</option>
+      <option value="Dutch">Nederlands</option>
+      <option value="Italian">Italiaans</option>
     </select>
   <br><br>
-    <label for="tutorial-checkbox">@35</label>
+    <label for="tutorial-checkbox">Toon handleiding?</label>
     <input type="checkbox" name="tutorial-checkbox" id="tutorial-checkbox" value="yes">
 </form>
 </center>

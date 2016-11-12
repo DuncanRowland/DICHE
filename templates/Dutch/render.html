@@ -21,8 +21,8 @@
                 </div>
         </div>
         <div class="jp-no-solution">
-                @13<br />
-                @14
+                Media Player fout<br />
+                Update je browser of Flash plugin
         </div>
 </div>
 
@@ -30,18 +30,18 @@
 
 <center>
 <br>
-<button id="create-video">@18</button>
+<button id="create-video">Vertaal...</button>
 <span id="dbsave">
 &nbsp
 <button id="dbbutton" class="ui-widget-content ui-corner-all">
-   <img class="dbbuttonimg" src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbsp@19
+   <img class="dbbuttonimg" src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbspBewaar
 </button>
 &nbsp
-<button id="download" class="ui-widget-content ui-corner-all">@20</button>
+<button id="download" class="ui-widget-content ui-corner-all">Download</button>
 <br><br>
 <div style="position:absolute;bottom:16px;width:100%;margin:0 auto;">
 <button id="smbutton" class="ui-widget-content ui-corner-all">
-   @21<img class="smbuttonimg" src='/static/images/sm_monkeyhead_1colorgreen.png' />&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+   Feedback<img class="smbuttonimg" src='/static/images/sm_monkeyhead_1colorgreen.png' />&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
 </button>
 </div>
 </span>
@@ -251,7 +251,7 @@ $(document).ready(function() {
 
    //Allow render interrupt with cancel button
    setup_cancel_button = function() {
-   $('#busyspinner').append('<div><button id="cancel">@51</button></div>');
+   $('#busyspinner').append('<div><button id="cancel">Interrupt</button></div>');
    $('#cancel').button().on("click", function() {
       $(this).prop("disabled",true).button('refresh', true)
       $.ajax({

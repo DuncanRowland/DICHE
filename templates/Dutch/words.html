@@ -39,7 +39,7 @@ $(document).ready(function(){
       buttons: {
         Create:{
           class: 'leftButton',
-          html: "<img class='dbbuttonimg' src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbsp@19",
+          html: "<img class='dbbuttonimg' src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbspBewaar",
           id: "dbsave",
           click: function(){
              var url = $("#wordsimage").attr("src");
@@ -57,7 +57,7 @@ $(document).ready(function(){
            }
         },
         Cancel:{
-          text: '@50',
+          text: 'Cancel',
           click: function() {
             dialog.dialog("close");
           }
@@ -70,7 +70,7 @@ $(document).ready(function(){
        if ( !( /^([0-9a-zA-Z-\n\r\s])*$/.test( words.val() ) ) ) {
           words.addClass( "ui-state-error" );
           tips
-             .text( "@44" )
+             .text( "Letters, - and numbers only" )
              .addClass( "ui-state-highlight" );
           setTimeout(function() {
              tips.removeClass( "ui-state-highlight", 1500 );
@@ -99,15 +99,15 @@ $(document).ready(function(){
   } );
   </script>
 
-<div id="dialog-form" title="@45">
+<div id="dialog-form" title="Save to Dropbox">
 <img id="wordsimage" style="width:100%;height=auto;"></img>
 </div>
 
 <!-- GUI -->
 <center>
-<h3>@46</h3>
-<p class="validateTips">@47</p>
+<h3>Titel en credits</h3>
+<p class="validateTips">Voeg tekst toe aan afbeelding</p>
 <textarea rows="5" cols="30" id="words" class="ui-widget ui-state-default ui-corner-all"></textarea>
 <br><br>
-<button id="create-image">@48</button>
+<button id="create-image">Start...</button>
 </center>

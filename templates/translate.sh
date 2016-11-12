@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 SRC="Blank"
-DST="English"
+DST="Dutch"
 
 #rm -rf $DST
 
