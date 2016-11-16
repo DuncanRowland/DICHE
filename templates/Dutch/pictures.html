@@ -181,7 +181,7 @@ $(document).ready(function() {
                 },
                 pause: function(event) {
                    jPlayerPaused=true;
-                   jPlayerCurrentTime = event.jPlayer.status.currentTime;
+                   jPlayerCurrentTime = Math.round(event.jPlayer.status.currentTime*10.0)/10.0;
                 },
                 ended: function(event) {
                    jPlayerCurrentTime = 0;
@@ -247,7 +247,7 @@ $(document).ready(function() {
         if((thiseventtime-lasteventtime)<100) return; //Prevent double trigger (250ms for player)
         lasteventtime = thiseventtime;
         //console.log(thiseventtime);
-        jPlayerCurrentTime=event.jPlayer.status.currentTime;
+        jPlayerCurrentTime = Math.round(event.jPlayer.status.currentTime*10.0)/10.0;
         newIndex=calcIndex();
         if(jPlayerCurrentIndex!=newIndex) {
             swiper.slideTo(newIndex);
@@ -259,7 +259,7 @@ $(document).ready(function() {
         if((thiseventtime-lasteventtime)<100) return; //Prevent double trigger (250ms for player)
         lasteventtime = thiseventtime;
         //console.log(thiseventtime);
-        jPlayerCurrentTime=event.jPlayer.status.currentTime;
+        jPlayerCurrentTime = Math.round(event.jPlayer.status.currentTime*10.0)/10.0;
         newIndex=calcIndex();
         if(jPlayerCurrentIndex!=newIndex) {
             swiper.slideTo(newIndex);
