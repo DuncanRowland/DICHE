@@ -171,6 +171,16 @@ class LogHandler(tornado.web.RequestHandler):
             self.send_error(404)
             return
         self.write("<PRE>")
+        with open("logs/trace.log", 'r') as f:
+            self.write(f.read())
+
+class DebugHandler(tornado.web.RequestHandler):
+   def get(self):
+        _account_id = tornado.escape.to_basestring(self.get_secure_cookie('account_id'))
+        if not _account_id or _account_id!=ADMIN1:
+            self.send_error(404)
+            return
+        self.write("<PRE>")
         with open("logs/access.log", 'r') as f:
             self.write(f.read())
 
@@ -463,7 +473,8 @@ def make_app():
         (r"/userfiles/(.*)", tornado.web.StaticFileHandler, {'path':'userfiles'}),
         (r"/render", RenderHandler),
         (r"/logout", LogoutHandler),
-        (r"/log", LogHandler),
+        (r"/debug", DebugHandler),
+        (r"/trace", LogHandler),
         (r"/robots.txt", RobotsHandler),
         (r"/favicon.ico()", tornado.web.StaticFileHandler, {'path':'static/images/fav/favicon.ico'}),
         (r"http(.*)", DropHandler),
