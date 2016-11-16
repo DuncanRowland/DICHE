@@ -1,7 +1,8 @@
 #!/bin/bash -e
 
 SRC="Blank"
-DST="Dutch"
+for DST in Dutch Italian English
+do
 
 #rm -rf $DST
 
@@ -23,5 +24,7 @@ do
       l=$((l+1))
    done < $DST.cnv
    mv tmp1 $DST/$i
+done
+
 done
 

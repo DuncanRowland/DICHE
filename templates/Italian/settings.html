@@ -152,11 +152,14 @@ $(document).ready(function(){
          buttons: {
             Create:{ 
                class: 'leftButton',
-               text: 'Create',
+               text: 'Crea',
                click : createProject
             },
-            Cancel: function() {
-               dialog.dialog( "close" );
+            Cancel:{
+               text: 'Cancella',
+               click : function() {
+                  dialog.dialog( "close" );
+               }
             }
          },
          close: function() {
@@ -177,11 +180,11 @@ $(document).ready(function(){
 }); //End Document Ready
 </script>
 
-<div id="dialog-form" title="Create new project">
-  <p class="validateTips">Enter new project name:</p>
+<div id="dialog-form" title="Crea un nuovo progetto">
+  <p class="validateTips">Inserisci il nome di un nuovo progetto</p>
   <form>
     <fieldset>
-      <input type="text" id="projname" placeholder="New-Name" class="text ui-widget-content ui-corner-all">
+      <input type="text" id="projname" placeholder="Nuovo nome" class="text ui-widget-content ui-corner-all">
       <!-- Allow form submission with keyboard without duplicating the dialog button -->
       <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
     </fieldset>
@@ -190,25 +193,25 @@ $(document).ready(function(){
 
 <!-- GUI -->
 <center>
-<h3>Project Name</h3>
+<h3>Nome del progetto</h3>
 <select id="selectmenu">
-    <option value="-1" disabled selected>Select Project</option>
+    <option value="-1" disabled selected>Seleziona il progetto</option>
     {% for p in projects %}
        <option value="{{p}}" {% if p==selected_project %}selected{% end %}>{{p}}</option>
     {% end %}
 </select>
 <br><br>
-<button id="create-project">New...</button>
+<button id="create-project">Nuovo...</button>
 <br><br><br>
 <form id="tutorialForm">
     <select id="selectlanguagemenu">
-      <option value="-1" disabled selected>Language</option>
+      <option value="-1" disabled selected>Lingua</option>
       <option value="English">English</option>
-      <option value="Dutch">Dutch</option>
-      <option value="Italian">Italian</option>
+      <option value="Dutch">Nederlands</option>
+      <option value="Italian">Italiano</option>
     </select>
   <br><br>
-    <label for="tutorial-checkbox">Show Tutorial?</label>
+    <label for="tutorial-checkbox">Mostra il tutorial?</label>
     <input type="checkbox" name="tutorial-checkbox" id="tutorial-checkbox" value="yes">
 </form>
 </center>

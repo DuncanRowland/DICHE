@@ -156,7 +156,7 @@ $(document).ready(function(){
                click : createProject
             },
             Cancel:{
-               text: 'Cancel',
+               text: 'Stop',
                click : function() {
                   dialog.dialog( "close" );
                }
@@ -180,11 +180,11 @@ $(document).ready(function(){
 }); //End Document Ready
 </script>
 
-<div id="dialog-form" title="Start een nieuw project">
-  <p class="validateTips">Voeg een nieuwe projectnaam toe:</p>
+<div id="dialog-form" title="Start nieuw project">
+  <p class="validateTips">Voeg nieuwe projectnaam toe:</p>
   <form>
     <fieldset>
-      <input type="text" id="projname" placeholder="New-Name" class="text ui-widget-content ui-corner-all">
+      <input type="text" id="projname" placeholder="Nieuwe-naam" class="text ui-widget-content ui-corner-all">
       <!-- Allow form submission with keyboard without duplicating the dialog button -->
       <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
     </fieldset>
@@ -195,7 +195,7 @@ $(document).ready(function(){
 <center>
 <h3>Projectnaam</h3>
 <select id="selectmenu">
-    <option value="-1" disabled selected>Select Project</option>
+    <option value="-1" disabled selected>Selecteer project</option>
     {% for p in projects %}
        <option value="{{p}}" {% if p==selected_project %}selected{% end %}>{{p}}</option>
     {% end %}
@@ -206,9 +206,9 @@ $(document).ready(function(){
 <form id="tutorialForm">
     <select id="selectlanguagemenu">
       <option value="-1" disabled selected>Taal</option>
-      <option value="English">Engels</option>
+      <option value="English">English</option>
       <option value="Dutch">Nederlands</option>
-      <option value="Italian">Italiaans</option>
+      <option value="Italian">Italiano</option>
     </select>
   <br><br>
     <label for="tutorial-checkbox">Toon handleiding?</label>

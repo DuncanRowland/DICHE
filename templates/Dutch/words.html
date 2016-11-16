@@ -39,7 +39,7 @@ $(document).ready(function(){
       buttons: {
         Create:{
           class: 'leftButton',
-          html: "<img class='dbbuttonimg' src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbspBewaar",
+          html: "<img class='dbbuttonimg' src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbspBewaren",
           id: "dbsave",
           click: function(){
              var url = $("#wordsimage").attr("src");
@@ -57,7 +57,7 @@ $(document).ready(function(){
            }
         },
         Cancel:{
-          text: 'Cancel',
+          text: 'Stop',
           click: function() {
             dialog.dialog("close");
           }
@@ -70,7 +70,7 @@ $(document).ready(function(){
        if ( !( /^([0-9a-zA-Z-\n\r\s])*$/.test( words.val() ) ) ) {
           words.addClass( "ui-state-error" );
           tips
-             .text( "Letters, - and numbers only" )
+             .text( "Letters, - en alleen cijfers" )
              .addClass( "ui-state-highlight" );
           setTimeout(function() {
              tips.removeClass( "ui-state-highlight", 1500 );
@@ -99,7 +99,7 @@ $(document).ready(function(){
   } );
   </script>
 
-<div id="dialog-form" title="Save to Dropbox">
+<div id="dialog-form" title="Bewaar in Dropbox">
 <img id="wordsimage" style="width:100%;height=auto;"></img>
 </div>
 

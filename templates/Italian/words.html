@@ -39,7 +39,7 @@ $(document).ready(function(){
       buttons: {
         Create:{
           class: 'leftButton',
-          html: "<img class='dbbuttonimg' src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbspSave...",
+          html: "<img class='dbbuttonimg' src='/static/images/dropbox-icon.png' />&nbsp&nbsp&nbsp&nbsp&nbspSalva...",
           id: "dbsave",
           click: function(){
              var url = $("#wordsimage").attr("src");
@@ -56,8 +56,11 @@ $(document).ready(function(){
              Dropbox.save(url, "Words.jpg" , options);
            }
         },
-        Cancel: function() {
-          dialog.dialog("close");
+        Cancel:{
+          text: 'Cancella',
+          click: function() {
+            dialog.dialog("close");
+          }
         }
       },
       close: function() {}
@@ -67,7 +70,7 @@ $(document).ready(function(){
        if ( !( /^([0-9a-zA-Z-\n\r\s])*$/.test( words.val() ) ) ) {
           words.addClass( "ui-state-error" );
           tips
-             .text( "Letters, - and numbers only" )
+             .text( "Lettere, - e numeri soltanto" )
              .addClass( "ui-state-highlight" );
           setTimeout(function() {
              tips.removeClass( "ui-state-highlight", 1500 );
@@ -96,15 +99,15 @@ $(document).ready(function(){
   } );
   </script>
 
-<div id="dialog-form" title="Save to Dropbox">
+<div id="dialog-form" title="Salva su Dropbox">
 <img id="wordsimage" style="width:100%;height=auto;"></img>
 </div>
 
 <!-- GUI -->
 <center>
-<h3>Title and Credits</h3>
-<p class="validateTips">Enter Text for Image</p>
+<h3>Titolo e Crediti</h3>
+<p class="validateTips">Inserisci un'immagine con testo</p>
 <textarea rows="5" cols="30" id="words" class="ui-widget ui-state-default ui-corner-all"></textarea>
 <br><br>
-<button id="create-image">Create...</button>
+<button id="create-image">Crea...</button>
 </center>
