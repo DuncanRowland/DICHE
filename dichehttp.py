@@ -477,8 +477,8 @@ def make_app():
         (r"/trace", LogHandler),
         (r"/robots.txt", RobotsHandler),
         (r"/favicon.ico()", tornado.web.StaticFileHandler, {'path':'static/images/fav/favicon.ico'}),
-        (r"http(.*)", DropHandler),
-        (r"/cgi(.*)", DropHandler),
+#        (r"http(.*)", DropHandler),
+#        (r"/cgi(.*)", DropHandler),
         (r"/", LandingHandler),
     ],debug=False, cookie_secret=COOKIE_SECRET)
 
